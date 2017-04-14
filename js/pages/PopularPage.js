@@ -26,7 +26,10 @@ export default class PopularPage extends Component{
     }
     render(){
         return <View style={styles.container}>
-            <NavigationBar barTitle={this.props.tabTitle} search={true} menu={true}/>
+            <NavigationBar
+                barTitle={this.props.tabTitle}
+                search={true}
+                menu={true}/>
             <ScrollableTabView
                 tabBarBackgroundColor="#63b8ff"
                 tabBarActiveTextColor="white"
@@ -103,7 +106,7 @@ class PopularTab extends Component{
         this.setState({
             isRefreshing:true
         });
-        var url = `${BASE_URL}repositories?q=${this.props.tabLabel}&sort=stars`;
+        let url = `${BASE_URL}repositories?q=${this.props.tabLabel}&sort=stars`;
         console.log(url);
         fetch(url)
             .then((res) => res.json())
@@ -115,6 +118,7 @@ class PopularTab extends Component{
             })
             .catch((error)=>{
                 console.log(error);
+                ToastAndroid.show("网络错误！", ToastAndroid.SHORT);
                 this.setState({
                     isRefreshing:false
                 });
@@ -156,11 +160,11 @@ const styles = StyleSheet.create({
         margin:10
     },
     itemTitle:{
-        fontSize:16,
+        fontSize:18,
         color:'black'
     },
     itemOwner:{
-        fontSize:14,
+        fontSize:16,
         color:'gray'
     }
 })

@@ -22,17 +22,20 @@ export default class MyPage extends Component{
 
     render(){
         return <View style={styles.container}>
-            <NavigationBar barTitle={this.props.pageTitle} search={false} menu={false}/>
+            <NavigationBar barTitle={this.props.pageTitle}/>
             <TouchableOpacity
                 activeOpacity={0.5}
                 style={styles.preferenceSettingStyle}
                 onPress={this.startCustomPage.bind(this)}>
-                <Text>自定义标签</Text>
+                <Text style={styles.preferenceSettingTextStyle}>自定义标签</Text>
             </TouchableOpacity>
         </View>
     }
     startCustomPage=()=>{
         this.props.navigator.push({
+            passProp:{
+                navigator:this.props.navigator,
+            },
             component:CustomTabPage
         })
     }
@@ -46,10 +49,13 @@ const styles = StyleSheet.create({
         borderTopWidth:1,
         borderBottomWidth:1,
         height:50,
-        borderColor:'#eee',
-        fontSize:20,
+        borderColor:'red',
         justifyContent:'center',
         alignItems:'flex-start',
         margin:10,
+    },
+    preferenceSettingTextStyle:{
+        fontSize:20,
+        marginLeft:10
     },
 });
