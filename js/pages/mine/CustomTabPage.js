@@ -8,26 +8,32 @@ import {
     Text,
     View,
     Image,
-    ToastAndroid
+    ToastAndroid,
+    AsyncStorage
 } from 'react-native';
 
-import CheckBox from 'react-native-check-box'
-import Dimensions from 'Dimensions'
+import CheckBox from 'react-native-check-box';
+import EasyToast from 'react-native-easy-toast';
+import Dimensions from 'Dimensions';
 
 import NavigationBar from '../../components/NavigationBar'
 
 const ScreenWidth = Dimensions.get('window').width;
+const KEY_STORAGE = 'custom_key';
+const DEF_DATA =[
+    {name:'Android', checked:false},
+    {name:'IOS', checked:false},
+    {name:'React', checked:false},
+    {name:'JavaScript', checked:false},
+    {name:'Java', checked:false}
+];
 
 export default class CustomTabPage extends Component{
     constructor(props){
         super(props);
+
         this.state={
-            data:[{name:'Android', checked:true},
-                {name:'IOS', checked:false},
-                {name:'React', checked:false},
-                {name:'JavaScript', checked:true},
-                {name:'Java', checked:true}
-            ]
+            data:DEF_DATA
         }
     }
     render(){
@@ -51,7 +57,23 @@ export default class CustomTabPage extends Component{
                     {this.renderRightCheckBoxs()}
                 </View>
             </View>
+            <EasyToast ref="toastRef"/>
         </View>
+    }
+    componentDidMount(){
+        AsyncStorage.getItem(KEY_STORAGE)
+            .then((res)=>{
+            if(res !== undefined && res !== null) {
+                this.setState({
+                    data: JSON.parse(res)
+                });
+            }
+            })
+            .catch(()=>{
+                this.toast("加载失败");
+            });
+    }
+    componentDidUpdate(){
     }
     // render
     renderLeftCheckBoxs=()=>{
@@ -70,7 +92,7 @@ export default class CustomTabPage extends Component{
                 style={styles.checkBoxWrapperStyle}>
                 <CheckBox
                     rightTextStyle={{fontSize:18}}
-                    onClick={this.handleCheckClick}
+                    onClick={()=>this.handleCheckClick(item)}
                     rightText={item.name}
                     isChecked={item.checked}
                     unCheckedImage={this.renderCkeckImage(false)}
@@ -80,6 +102,7 @@ export default class CustomTabPage extends Component{
     }
     renderCkeckImage=(checked)=>{
         return <Image
+            style={styles.checkboxImgStyle}
             source={checked?
                 require('../../../res/images/ic_check_box.png'):
                 require('../../../res/images/ic_check_box_outline_blank.png')}
@@ -91,13 +114,21 @@ export default class CustomTabPage extends Component{
         this.props.navigator.pop();
     }
     rightPress=()=>{
-        this.toast('rightPress');
+        AsyncStorage.setItem(KEY_STORAGE, JSON.stringify(this.state.data))
+            .then(()=>{
+                this.toast('saved')
+                this.backPress();
+            })
+            .catch(()=>{
+                this.toast('saved error')
+            })
     }
-    handleCheckClick=()=>{
-        this.toast('handleCheckClick ');
+    handleCheckClick=(item)=>{
+        item.checked = !item.checked;
     }
     toast=(msg)=>{
-        ToastAndroid.show(msg, ToastAndroid.SHORT);
+        // ToastAndroid.show(msg, ToastAndroid.SHORT);
+        this.refs.toastRef.show(msg);
     }
 
 }
@@ -106,6 +137,9 @@ const styles = StyleSheet.create({
    container:{
        flex:1,
    },
+    checkboxImgStyle:{
+       tintColor:'#63b8ff'
+    },
     checkboxsWrapperStyle:{
         flex:1,
         flexDirection:'row',
