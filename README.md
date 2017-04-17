@@ -29,3 +29,16 @@ static propsTypes={
 ### ref使用
 > 通过给组件设置特定的ref值，从而在代码中可以通过ref获取组件对象
 
+
+## lsn14
+### `CheckBox`组件
+#### 安装
+````
+npm install react-native-check-box --save
+````
+#### 使用
+````
+// 引入
+import CheckBox from 'react-native-check-box'
+
+````
