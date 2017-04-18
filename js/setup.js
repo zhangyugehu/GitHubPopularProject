@@ -14,19 +14,21 @@ import HomePage from './pages/HomePage'
 export default function setup() {
     class Root extends Component {
         render() {
-            return (
-                <Navigator
-                    initialRoute={{component: HomePage}}
-                    renderScene={(route, navigator)=>this.renderScene(route, navigator)}
-                    configureScene={route=>Navigator.SceneConfigs.FadeAndroid}
-                />
-            );
+            return <Navigator
+                initialRoute={{
+                    name:'HomePage',
+                    component: HomePage
+                }}
+                renderScene={(route, navigator)=>this._renderScene(route, navigator)}
+                configureScene={route=>Navigator.SceneConfigs.PushFromRight}
+            />
         }
-        renderScene(route, navigator){
-            let Component = route.component;
-            return <Component navigator={navigator}/>
+
+        _renderScene(route, navigator){
+            let Target = route.component;
+            return <Target {...route.params} navigator={navigator}/>
         }
     }
 
-    return <Root/>
+    return <Root />
 }

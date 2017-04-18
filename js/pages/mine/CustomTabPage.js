@@ -20,13 +20,7 @@ import NavigationBar from '../../components/NavigationBar'
 
 const ScreenWidth = Dimensions.get('window').width;
 const KEY_STORAGE = 'custom_key';
-const DEF_DATA =[
-    {name:'Android', checked:false},
-    {name:'IOS', checked:false},
-    {name:'React', checked:false},
-    {name:'JavaScript', checked:false},
-    {name:'Java', checked:false}
-];
+const DEF_DATA = require('../../../mock/default/def_languages.json');
 
 export default class CustomTabPage extends Component{
     constructor(props){
@@ -39,7 +33,7 @@ export default class CustomTabPage extends Component{
     render(){
         return <View style={styles.container}>
             <NavigationBar
-                barTitle="自定义标签"
+                barTitle='自定义标签'
                 search={false}
                 menu={false}
                 right={true}
@@ -72,8 +66,6 @@ export default class CustomTabPage extends Component{
             .catch(()=>{
                 this.toast("加载失败");
             });
-    }
-    componentDidUpdate(){
     }
     // render
     renderLeftCheckBoxs=()=>{
@@ -116,7 +108,7 @@ export default class CustomTabPage extends Component{
     rightPress=()=>{
         AsyncStorage.setItem(KEY_STORAGE, JSON.stringify(this.state.data))
             .then(()=>{
-                this.toast('saved')
+                // this.toast('saved')
                 this.backPress();
             })
             .catch(()=>{
@@ -127,8 +119,7 @@ export default class CustomTabPage extends Component{
         item.checked = !item.checked;
     }
     toast=(msg)=>{
-        // ToastAndroid.show(msg, ToastAndroid.SHORT);
-        this.refs.toastRef.show(msg);
+        this.refs.toastRef.show(msg, 2000);
     }
 
 }

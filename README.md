@@ -83,3 +83,11 @@ componentWillReceiveProps(nextProps){
 npm i react-native-easy-toast --save
 ```
 
+## 可拖动排序的listview
+
+````
+npm i react-native-sortable-listview --save`
+````
+
+## Object.keys
+> 返回一个数组，可以获取对象的所有属性，或者一个数组的所有元素的索引值

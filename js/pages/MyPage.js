@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import NavigationBar from '../components/NavigationBar';
 import CustomTabPage from './mine/CustomTabPage'
+import SortKeyPage from './mine/SortKeyPage'
 
 export default class MyPage extends Component{
     constructor(props){
@@ -27,20 +28,24 @@ export default class MyPage extends Component{
                 onPress={()=>this.startCustomPage()}
                 title='自定义标签'/>
             <PreferenceCompontent
-                onPress={this.startOrderPage()}
+                onPress={()=>this.startOrderPage()}
                 title='排序'/>
         </View>
     }
     startCustomPage=()=>{
-        this.props.navigator.push({
-            passProp:{
-                navigator:this.props.navigator,
-            },
-            component:CustomTabPage
-        })
+        this.startPage(CustomTabPage);
     }
     startOrderPage=()=>{
+        this.startPage(SortKeyPage);
+    }
 
+    startPage(page) {
+        this.props.navigator.push({
+            params:{
+                navigator:this.props.navigator,
+            },
+            component:page
+        })
     }
 }
 
@@ -66,14 +71,15 @@ class PreferenceCompontent extends Component{
 const styles = StyleSheet.create({
     container:{
         flex:1,
+        backgroundColor:'white'
     },
     preferenceSettingStyle:{
         borderBottomWidth:1,
         height:50,
-        borderColor:'red',
+        borderColor:'#e8e8e8',
         justifyContent:'center',
         alignItems:'flex-start',
-        margin:10,
+        marginLeft:10
     },
     preferenceSettingTextStyle:{
         fontSize:20,
