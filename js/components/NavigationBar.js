@@ -36,7 +36,8 @@ export default class NavigationBar extends Component{
         backPress:null,
         right:false,
         rightText:TEXT_RIGHT,
-        rightPress:null
+        rightPress:null,
+        rightView:null
     }
     // static propTypes={
     //     search:PropTypes.boolean,
@@ -66,6 +67,7 @@ export default class NavigationBar extends Component{
                 </View>
                 <View>
                     {this.renderRight()}
+                    {this.props.rightView}
                 </View>
             </View>
         </View>

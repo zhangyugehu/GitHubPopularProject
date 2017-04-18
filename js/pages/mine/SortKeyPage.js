@@ -8,49 +8,29 @@ import {
     Text,
     View,
     Image,
-    ToastAndroid,
+    Alert,
     AsyncStorage,
-    TouchableHighlight
+    TouchableHighlight,
+    DeviceEventEmitter
 } from 'react-native';
 import NavigationBar from '../../components/NavigationBar'
 import SortableListView from 'react-native-sortable-listview'
 
 const KEY_STORAGE = 'custom_key';
+const KEY_REFRESH = 'key_refresh';
 const DEF_DATA = require('../../../mock/default/def_languages.json');
 let _languages = [];
+let _unCheckedLanguages = [];
 
 export default class SortKeyPage extends Component{
     constructor(props){
         super(props);
-        DEF_DATA.forEach((item)=>{
-            if(item.checked) _languages.push(item.name)
-        })
         this.state={
             data:_languages
         }
     }
     componentDidMount(){
-        _languages = []
-        AsyncStorage.getItem(KEY_STORAGE)
-            .then((value)=>{
-                JSON.parse(value).forEach((item)=>{
-                    if(item.checked) _languages.push(item.name)
-                })
-                this.setState({
-                    data:_languages
-                })
-            })
-            .catch((error)=>{
-                JSON.parse(DEF_DATA).forEach((item)=>{
-                    if(item.checked) _languages.push(item.name)
-                })
-            })
-            .then(()=>{
-                this.setState({
-                    data:_languages
-                })
-            })
-            .done()
+        this._getStorageData();
     }
 
     render(){
@@ -62,23 +42,83 @@ export default class SortKeyPage extends Component{
                 right={true}
                 rightText="保存"
                 left={true}
-                backPress={()=>this.onBack()}
-                rightPress={()=>this.onSave()}
+                backPress={()=>this._onBack()}
+                rightPress={()=>this._onSave()}
             />
             <SortableListView
+                delayLongPress={500}
                 data={this.state.data}
                 order={Object.keys(this.state.data)}
-                renderRow={row=><RowComponent data={row}/>}
+                renderRow={row=><RowComponent data={row.name}/>}
+                onRowMoved={e=> {
+                    this.state.data.splice(e.to, 0, this.state.data.splice(e.from, 1)[0]);
+                    this.forceUpdate();
+                }}
             />
         </View>
     }
 
-    onBack() {
+    _getDefData(){
+        this._reSetCache(DEF_DATA)
+    }
+    _getStorageData(){
+        AsyncStorage.getItem(KEY_STORAGE)
+            .then((value)=>{
+                var data = JSON.parse(value)
+                if(this._isNull(data)){
+                    AsyncStorage.setItem(KEY_STORAGE, JSON.stringify(DEF_DATA))
+                        .catch();
+                    this._getDefData();
+                }else{
+                    this._reSetCache(data)
+                }
+            })
+            .catch((error)=>{
+                this._getDefData();
+            })
+            .done()
+    }
+    _reSetCache(data){
+        _languages = [];
+        _unCheckedLanguages=[];
+        data.forEach((item)=>{
+            if(item.checked){
+                _languages.push(item)
+            }else{
+                _unCheckedLanguages.push(item)
+            }
+        })
+        this.setState({
+            data:_languages
+        })
+    }
+    _isNull(obj){
+        return obj === undefined || obj === null;
+    }
+    _saveToStorage(func, fail){
+        var allLanguages = this.state.data;
+        _unCheckedLanguages.forEach((item)=>{
+            allLanguages.push(item)
+        })
+        var value = JSON.stringify(allLanguages);
+        AsyncStorage.setItem(KEY_STORAGE, value)
+            .then(()=>func())
+            .catch((e)=>fail(e))
+            .done();
+    }
+
+    _onBack() {
         this.props.navigator.pop();
     }
 
-    onSave() {
-
+    _onSave() {
+        this._saveToStorage(()=>{
+            DeviceEventEmitter.emit(KEY_REFRESH, '');
+            this._onBack();
+        },
+        (error)=>{
+            Alert.alert("错误", error);
+        })
     }
 }
 class RowComponent extends Component{
@@ -86,7 +126,11 @@ class RowComponent extends Component{
         super(props)
     }
     render(){
-        return  <TouchableHighlight>
+        return <TouchableHighlight
+            underlayColor={'white'}
+            delayLongPress={200}
+            {...this.props.sortHandlers}
+            >
             <View style={styles.itemWrapperStyle}>
                 <Image source={require('../../../res/images/ic_sort.png')} style={styles.itemImageStyle}/>
                 <Text style={styles.itemTextStyle}>{this.props.data}</Text>

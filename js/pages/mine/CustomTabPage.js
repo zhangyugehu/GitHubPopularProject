@@ -9,7 +9,8 @@ import {
     View,
     Image,
     ToastAndroid,
-    AsyncStorage
+    AsyncStorage,
+    DeviceEventEmitter
 } from 'react-native';
 
 import CheckBox from 'react-native-check-box';
@@ -20,6 +21,7 @@ import NavigationBar from '../../components/NavigationBar'
 
 const ScreenWidth = Dimensions.get('window').width;
 const KEY_STORAGE = 'custom_key';
+const KEY_REFRESH = 'key_refresh';
 const DEF_DATA = require('../../../mock/default/def_languages.json');
 
 export default class CustomTabPage extends Component{
@@ -108,7 +110,7 @@ export default class CustomTabPage extends Component{
     rightPress=()=>{
         AsyncStorage.setItem(KEY_STORAGE, JSON.stringify(this.state.data))
             .then(()=>{
-                // this.toast('saved')
+                DeviceEventEmitter.emit(KEY_REFRESH, '');
                 this.backPress();
             })
             .catch(()=>{
