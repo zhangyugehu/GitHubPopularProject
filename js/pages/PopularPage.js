@@ -11,18 +11,43 @@ import {
     TouchableOpacity,
     Image,
     RefreshControl,
-    ToastAndroid
+    ToastAndroid,
+    AsyncStorage
 } from 'react-native';
 import NavigationBar from '../components/NavigationBar'
 import ScrollableTabView from 'react-native-scrollable-tab-view'
 import ItemDetails from './popular/ItemDetails'
 
+const KEY_STORAGE = 'custom_key';
+const DEF_LANGUAGES = require('../../mock/default/def_languages.json');
+let _languages = []
+
 export default class PopularPage extends Component{
     constructor(props){
         super(props);
         this.state = {
-            languages:['Android', 'IOS', 'Java', 'React Native'],
+            languages:_languages
         }
+    }
+    componentDidMount(){
+        AsyncStorage.getItem(KEY_STORAGE)
+            .then((value)=> {
+                var data = JSON.parse(value);
+                _languages = [];
+                data.map((item, i) => {
+                    if(item.checked) _languages.push(item.name);
+                });
+                this.setState({
+                    languages:_languages
+                })
+            })
+            .catch((error)=>{
+                _languages=[];
+                DEF_LANGUAGES.map((item,i)=>{
+                    if(item.checked) _languages.push(item.name);
+                })
+            })
+            .done();
     }
     render(){
         return <View style={styles.container}>
@@ -31,24 +56,30 @@ export default class PopularPage extends Component{
                 search={true}
                 menu={true}/>
             <ScrollableTabView
+                ref="tabsRef"
                 tabBarBackgroundColor="#63b8ff"
                 tabBarActiveTextColor="white"
                 tabBarInactiveTextColor="#f5fffa"
                 tabBarUnderlineStyle={{backgroundColor:'#e7e7e7', height:2}}
                 >
                 {
-                    this.state.languages.map((tab, i) => {
-                        return <PopularTab
-                            key={tab + i}
-                            tabLabel={tab}
-                            navigator={this.props.navigator}/>
-                    })
+                    this.renderTabs()
                 }
             </ScrollableTabView>
         </View>
     }
 
     // ***
+    renderTabs() {
+        var flag = this.state.languages === undefined || this.state.languages === null;
+        return flag ? null:
+            this.state.languages.map((tab, i) =>
+                <PopularTab
+                    key={tab + i}
+                    tabLabel={tab}
+                    navigator={this.props.navigator}/>
+        )
+    }
 }
 
 const BASE_URL = 'https://api.github.com/search/';
