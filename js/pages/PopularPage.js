@@ -12,14 +12,16 @@ import {
     Image,
     RefreshControl,
     ToastAndroid,
-    AsyncStorage
+    AsyncStorage,
+    DeviceEventEmitter
 } from 'react-native';
 import NavigationBar from '../components/NavigationBar'
 import ScrollableTabView from 'react-native-scrollable-tab-view'
-import ItemDetails from './popular/ItemDetails'
+import DetailsPage from './popular/DetailsPage'
 
 const KEY_STORAGE = 'custom_key';
-const DEF_LANGUAGES = require('../../mock/default/def_languages.json');
+const KEY_REFRESH = 'key_refresh';
+const DEF_DATA = require('../../mock/default/def_languages.json');
 let _languages = []
 
 export default class PopularPage extends Component{
@@ -30,25 +32,15 @@ export default class PopularPage extends Component{
         }
     }
     componentDidMount(){
-        AsyncStorage.getItem(KEY_STORAGE)
-            .then((value)=> {
-                var data = JSON.parse(value);
-                _languages = [];
-                data.map((item, i) => {
-                    if(item.checked) _languages.push(item.name);
-                });
-                this.setState({
-                    languages:_languages
-                })
-            })
-            .catch((error)=>{
-                _languages=[];
-                DEF_LANGUAGES.map((item,i)=>{
-                    if(item.checked) _languages.push(item.name);
-                })
-            })
-            .done();
+        this.subscription = DeviceEventEmitter.addListener(KEY_REFRESH,
+                () => {this._getStorageData()})
+        this._getStorageData();
     }
+    componentWillUnmount() {
+        // 移除
+        this.subscription.remove();
+    }
+
     render(){
         return <View style={styles.container}>
             <NavigationBar
@@ -69,18 +61,57 @@ export default class PopularPage extends Component{
         </View>
     }
 
-    // ***
+    // render
     renderTabs() {
         var flag = this.state.languages === undefined || this.state.languages === null;
-        return flag ? null:
-            this.state.languages.map((tab, i) =>
-                <PopularTab
-                    key={tab + i}
-                    tabLabel={tab}
-                    navigator={this.props.navigator}/>
+        if(flag) {
+            return null;
+        }
+        return this.state.languages.map((tab, i) =>
+            <PopularTab
+                key={tab + i}
+                tabLabel={tab}
+                navigator={this.props.navigator}/>
         )
+
+    }
+
+    // func
+    _getDefaultData(){
+        this._reSetCache(DEF_DATA);
+    }
+
+    _getStorageData(){
+        AsyncStorage.getItem(KEY_STORAGE)
+            .then((value)=> {
+                var data = JSON.parse(value);
+                if(data === undefined || data === null){
+                    // 将默认数据填入 不进行重新渲染
+                    AsyncStorage.setItem(KEY_STORAGE, JSON.stringify(DEF_DATA))
+                        .catch();
+                    this._getDefaultData()
+                }else {
+                    this._reSetCache(data);
+                }
+            })
+            .catch((error)=>{
+                this._getDefaultData()
+            })
+            .done();
+    }
+
+    _reSetCache(data){
+        _languages = [];
+        data.forEach((item)=>{
+            if(item.checked) _languages.push(item.name)
+        })
+        this.setState({
+            languages:_languages
+        })
     }
 }
+
+
 
 const BASE_URL = 'https://api.github.com/search/';
 
@@ -109,7 +140,7 @@ class PopularTab extends Component{
         </View>
     }
 
-    // **
+    // render
     renderRow(item, id, position){
         return <TouchableOpacity activeOpacity={0.5} onPress={()=>{
             this.onItemClick(item, position);
@@ -133,6 +164,7 @@ class PopularTab extends Component{
             refreshing={this.state.isRefreshing}/>
     }
 
+    // func
     requireData(){
         this.setState({
             isRefreshing:true
@@ -157,12 +189,13 @@ class PopularTab extends Component{
             .done();
     }
     onItemClick(item, i){
-        // ToastAndroid.show(item.full_name, ToastAndroid.SHORT);
         this.props.navigator.push({
-            component:ItemDetails,
-            passProps:{
-                itemData:item
-            }
+            params:{
+                navigator:this.props.navigator,
+                title:item.name,
+                url:item.html_url
+            },
+            component:DetailsPage
         });
     }
 }
