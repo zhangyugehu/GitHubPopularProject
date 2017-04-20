@@ -11,13 +11,14 @@ import {
     TouchableOpacity,
     Image,
     RefreshControl,
-    ToastAndroid,
+    // ToastAndroid,
     AsyncStorage,
     DeviceEventEmitter
 } from 'react-native';
 import NavigationBar from '../components/NavigationBar'
 import ScrollableTabView from 'react-native-scrollable-tab-view'
 import DetailsPage from './popular/DetailsPage'
+import ItemComponent from '../components/ItemComponent'
 
 const KEY_STORAGE = 'custom_key';
 const KEY_REFRESH = 'key_refresh';
@@ -146,13 +147,21 @@ class PopularTab extends Component{
             this.onItemClick(item, position);
         }}>
             <View style={styles.itemContainer}>
-                <View>
-                    <Image style={styles.itemIcon} source={{uri:`${item.owner.avatar_url}`}}/>
-                </View>
-                <View style={styles.contentWrapper}>
-                    <Text style={styles.itemTitle}>{item.name}</Text>
-                    <Text style={styles.itemOwner}>{item.owner.login}</Text>
-                </View>
+                {/*<View>*/}
+                    {/*<Image style={styles.itemIcon} source={{uri:`${item.owner.avatar_url}`}}/>*/}
+                {/*</View>*/}
+                {/*<View style={styles.contentWrapper}>*/}
+                    {/*<ItemComponent />*/}
+                    {/*<Text style={styles.itemTitle}>{item.name}</Text>*/}
+                    {/*<Text style={styles.itemOwner}>{item.owner.login}</Text>*/}
+                 {/*</View>*/}
+
+
+                <ItemComponent
+                    name={item.name}
+                    author={item.owner.login}
+                    avatar={item.owner.avatar_url}
+                    favoritePress={(item)=>{this._favoritePress(item)}}/>
             </View>
         </TouchableOpacity>
     }
@@ -174,6 +183,10 @@ class PopularTab extends Component{
         fetch(url)
             .then((res) => res.json())
             .then((json)=>{
+                json.items.forEach((item)=>{
+                    console.log(item.owner.avatar_url);
+                })
+                // console.log(json);
                 this.setState({
                     dataSource:this.state.dataSource.cloneWithRows(json.items),
                     isRefreshing:false
@@ -181,7 +194,7 @@ class PopularTab extends Component{
             })
             .catch((error)=>{
                 console.log(error);
-                ToastAndroid.show("网络错误！", ToastAndroid.SHORT);
+                // ToastAndroid.show("网络错误！", ToastAndroid.SHORT);
                 this.setState({
                     isRefreshing:false
                 });
@@ -197,6 +210,9 @@ class PopularTab extends Component{
             },
             component:DetailsPage
         });
+    }
+    _favoritePress=(item)=>{
+        AsyncStorage.setItem()
     }
 }
 
