@@ -12,6 +12,8 @@ import {
 
 import TabNavigator from 'react-native-tab-navigator';
 import PopularPage from './PopularPage'
+import TendingPage from './TendingPage'
+import FavoritePage from './FavoritePage'
 import MyPage from './MyPage'
 
 const TAB_POPULAR = 'popular';
@@ -55,9 +57,7 @@ class HomePage extends Component {
                     onPress={() => {
                         this.setState({selectTab: TAB_TRENDING})
                     }}>
-                    <View style={{flex:1, flexDirection:'row', alignItems:'center', justifyContent:'center'}} >
-                        <Text style={{fontSize:25}}>{TITLE_TRENDING}</Text>
-                    </View>
+                    <TendingPage />
                 </TabNavigator.Item>
                 <TabNavigator.Item
                     title={TITLE_FAVORITE}
@@ -67,9 +67,7 @@ class HomePage extends Component {
                     onPress={() => {
                         this.setState({selectTab: TAB_FAVORITE})
                     }}>
-                    <View style={{flex:1, flexDirection:'row', alignItems:'center', justifyContent:'center'}} >
-                        <Text style={{fontSize:25}}>{TITLE_FAVORITE}</Text>
-                    </View>
+                    <FavoritePage />
                 </TabNavigator.Item>
                 <TabNavigator.Item
                     title={TITLE_MY}
