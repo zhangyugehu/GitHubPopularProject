@@ -7,7 +7,8 @@ import {
     StyleSheet,
     Text,
     View,
-    Image
+    Image,
+    DeviceEventEmitter
 } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view'
 import FavoriteModel from '../model/FavoriteModel'
@@ -15,6 +16,7 @@ import EasyToast from 'react-native-easy-toast';
 import NavigationBar from '../components/NavigationBar';
 import FavoriteTab from '../components/FavoriteTabComponent'
 
+const KEY_FAVORITE = "key_favorite"
 export default class FavoritePage extends Component{
     constructor(props){
         super(props);
@@ -23,7 +25,12 @@ export default class FavoritePage extends Component{
         }
     }
     componentDidMount(){
+        this.subscription = DeviceEventEmitter.addListener(KEY_FAVORITE,
+            () => {this._getData()})
         this._getData();
+    }
+    componentWillUnmount(){
+        this.subscription.remove();
     }
     render(){
         return <View style={styles.container}>

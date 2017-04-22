@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import NavigationBar from '../../components/NavigationBar'
 import FavoriteModel from '../../model/FavoriteModel'
+import EasyToast from 'react-native-easy-toast';
 
 export default class DetailsPage extends Component{
     constructor(props){
@@ -40,6 +41,7 @@ export default class DetailsPage extends Component{
                 startInLoadingState={true}
                 domStorageEnabled={true}
                 javaScriptEnabled={true}/>
+            <EasyToast ref="toastRef"/>
         </View>
     }
     _renderBarRight(){
@@ -52,9 +54,9 @@ export default class DetailsPage extends Component{
             </TouchableOpacity>
             <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={this._menuPress}>
-                <Image source={require('../../../res/images/ic_more_vert_white_48pt.png')}
-                       style={{marginLeft: 5, marginRight: 5, height:30, width:30}}/>
+                onPress={this._sharePress}>
+                <Image source={require('../../../res/images/ic_share.png')}
+                       style={{marginLeft: 10, marginRight: 5, height:23, width:23, tintColor:'#fff'}}/>
             </TouchableOpacity>
         </View>
     }
@@ -73,11 +75,19 @@ export default class DetailsPage extends Component{
     }
     _starPress = ()=>{
         FavoriteModel.save(this.props.language, this.props.item,
-            ()=>{},
-            (e)=>{});
+            ()=>{
+                // TODO 刷新收藏按钮状态
+                this._toast("完成")
+            },
+            (e)=>{
+                this._toast("错误：" + e)
+            });
     }
-    _menuPress =()=>{
-
+    _sharePress =()=>{
+        this._toast("分享功能")
+    }
+    _toast=(text)=>{
+        this.refs.toastRef.show(text, 1000);
     }
 }
 

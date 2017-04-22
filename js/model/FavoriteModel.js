@@ -3,9 +3,11 @@
  */
 import {
     AsyncStorage,
+    DeviceEventEmitter
 } from 'react-native';
 
 const KEY = "key_favorite";
+const KEY_FAVORITE = "key_favorite"
 export default class FavoriteModel{
     /**
      * 根据语言获取所有收藏
@@ -74,6 +76,7 @@ export default class FavoriteModel{
      * @param onFailure
      */
     static remove=(language, favorite, onSuccess, onFailure)=>{
+        // TODO 移除完某个语言下的所有项目将该语言也移除
         FavoriteModel.getFavoriteByLanguage(language,
             (favoritesjs)=>{
                 var favorites = JSON.parse(favoritesjs);
@@ -154,6 +157,7 @@ export default class FavoriteModel{
                     AsyncStorage.setItem('languages', JSON.stringify(languages))
                         .then(onSuccess)
                         .catch(onFailure);
+                    DeviceEventEmitter.emit(KEY_FAVORITE, '');
                 }
             },
             onFailure

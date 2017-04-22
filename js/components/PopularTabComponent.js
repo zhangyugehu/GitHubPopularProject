@@ -33,6 +33,7 @@ export default class PopularTabComponent extends Component{
     }
 
     componentDidMount(){
+        // TODO 点击收藏按钮无法自动刷新收藏状态，但手动刷新一边listview后按钮正常
         this.requireData();
     }
 
@@ -102,6 +103,7 @@ export default class PopularTabComponent extends Component{
             .done();
     }
     onItemClick(item, i){
+        // TODO 跳转后在详情也收藏返回时应该属性收藏状态
         this.props.navigator.push({
             params:{
                 navigator:this.props.navigator,
