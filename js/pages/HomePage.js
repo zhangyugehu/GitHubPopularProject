@@ -35,7 +35,7 @@ class HomePage extends Component {
 
     render() {
         return <View style={styles.container}>
-            <TabNavigator>
+            <TabNavigator tabBarStyle={{opacity:0.8 }} sceneStyle={{paddingBottom :0}}>
                 <TabNavigator.Item
                     title={TITLE_POPULAR}
                     selected={this.state.selectTab === TAB_POPULAR}
@@ -57,7 +57,7 @@ class HomePage extends Component {
                     onPress={() => {
                         this.setState({selectTab: TAB_TRENDING})
                     }}>
-                    <TendingPage />
+                    <TendingPage pageTitle={TITLE_TRENDING} navigator={this.props.navigator}/>
                 </TabNavigator.Item>
                 <TabNavigator.Item
                     title={TITLE_FAVORITE}
@@ -67,7 +67,7 @@ class HomePage extends Component {
                     onPress={() => {
                         this.setState({selectTab: TAB_FAVORITE})
                     }}>
-                    <FavoritePage />
+                    <FavoritePage pageTitle={TITLE_FAVORITE} navigator={this.props.navigator}/>
                 </TabNavigator.Item>
                 <TabNavigator.Item
                     title={TITLE_MY}

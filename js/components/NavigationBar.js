@@ -67,7 +67,6 @@ export default class NavigationBar extends Component{
                 </View>
                 <View>
                     {this.renderRight()}
-                    {this.props.rightView}
                 </View>
             </View>
         </View>
@@ -81,11 +80,15 @@ export default class NavigationBar extends Component{
                 onPress={this.props.rightPress}>
                 <Text style={styles.rightTextStyle}>{this.props.rightText}</Text>
             </TouchableOpacity>
-        }else{
+        }else if(this.props.menu || this.props.ssearche){
             // 右边为搜索和菜单
             return <View style={styles.searchableRightWrapper}>
                 {this.renderSearch()}
                 {this.renderMenu()}
+            </View>
+        }else{
+            return <View style={[styles.searchableRightWrapper,{height:BAR_ICON_SIZE, width:60}]}>
+                {this.props.rightView}
             </View>
         }
     }
@@ -98,7 +101,7 @@ export default class NavigationBar extends Component{
                        style={styles.navBtn}/>
             </TouchableOpacity>
             :
-            null
+            <View style={styles.navBtn}/>
     }
 
     renderMenu() {
@@ -110,7 +113,7 @@ export default class NavigationBar extends Component{
                        style={[styles.navBtn, {marginLeft: 5, marginRight: 5}]}/>
             </TouchableOpacity>
             :
-            null
+            <View style={[styles.navBtn, {marginLeft: 5, marginRight: 5}]}/>
     }
 
     renderLeft() {

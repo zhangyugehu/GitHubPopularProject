@@ -19,11 +19,11 @@ export default class ItemComponent extends Component{
         name:'name',
         author:'author',
         start:'99',
-        favorite:false
+        favorite:false,
+        isStar:false,
     }
     constructor(props){
         super(props);
-
     }
     render(){
         return <View style={styles.container}>
@@ -34,7 +34,11 @@ export default class ItemComponent extends Component{
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={()=>{this.props.favoritePress()}}>
-                    <Image style={styles.favoriteStyle} source={require('../../res/images/ic_favorite@2x.png')}/>
+                    <Image style={styles.favoriteStyle}
+                           source={this.props.isStar?
+                               require('../../res/images/ic_star.png'):
+                               require('../../res/images/ic_unstar_transparent.png')
+                           }/>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.bottomStyle}>
@@ -42,9 +46,6 @@ export default class ItemComponent extends Component{
                 </View>
             </View>
         </View>
-    }
-    _favoritePress(){
-        console.log("_favoritePress...");
     }
 }
 
