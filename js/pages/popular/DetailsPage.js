@@ -16,11 +16,9 @@ import {
     WebView
 } from 'react-native';
 import NavigationBar from '../../components/NavigationBar'
+import FavoriteModel from '../../model/FavoriteModel'
 
 export default class DetailsPage extends Component{
-    static defaultProps={
-        title:'title'
-    }
     constructor(props){
         super(props)
         this.state={
@@ -31,32 +29,32 @@ export default class DetailsPage extends Component{
         return <View style={styles.container}>
             <NavigationBar
                 left={true}
-                barTitle={this.props.title}
+                barTitle={this.props.item.name}
                 backPress={()=>this._onBack()}
-                rightView={()=>this._renderBarRight()}
+                rightView={this._renderBarRight()}
             />
             <WebView
                 onNavigationStateChange={this._handleNavStateChanged}
                 ref="webviewRef"
-                source={{uri:this.props.url}}
+                source={{uri:this.props.item.html_url}}
                 startInLoadingState={true}
                 domStorageEnabled={true}
                 javaScriptEnabled={true}/>
         </View>
     }
     _renderBarRight(){
-        return <View style={{flex:1, flexDirection:'row', width:80, height:30}}>
+        return <View style={{flex:1, flexDirection:'row', width:60, height:30, alignItems:'center'}}>
             <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={this.props.menuPress}>
-                <Image source={require('../../../res/images/ic_more_vert_white_48pt.png')}
-                       style={[styles.navBtn, {marginLeft: 5, marginRight: 5}]}/>
+                onPress={this._starPress}>
+                <Image source={require('../../../res/images/ic_star_navbar.png')}
+                       style={{height:20, width:20}}/>
             </TouchableOpacity>
             <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={this.props.menuPress}>
+                onPress={this._menuPress}>
                 <Image source={require('../../../res/images/ic_more_vert_white_48pt.png')}
-                       style={[styles.navBtn, {marginLeft: 5, marginRight: 5}]}/>
+                       style={{marginLeft: 5, marginRight: 5, height:30, width:30}}/>
             </TouchableOpacity>
         </View>
     }
@@ -72,6 +70,14 @@ export default class DetailsPage extends Component{
         this.setState({
             canGoBack:s.canGoBack
         })
+    }
+    _starPress = ()=>{
+        FavoriteModel.save(this.props.language, this.props.item,
+            ()=>{},
+            (e)=>{});
+    }
+    _menuPress =()=>{
+
     }
 }
 

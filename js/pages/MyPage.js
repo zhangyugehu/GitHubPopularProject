@@ -53,10 +53,14 @@ export default class MyPage extends Component{
             '提示',
             '清除数据',
             [
-                {text: '确定', onPress: () => {AsyncStorage.clear(()=>{
-                    this.refs.toastRef.show("数据已清楚", 2000);
-                    DeviceEventEmitter.emit(KEY_REFRESH, '');
-                })}},
+                {text: '确定',
+                    onPress: () => {
+                        AsyncStorage.clear((error)=>{
+                            this.refs.toastRef.show("数据已清楚", 2000);
+                            DeviceEventEmitter.emit(KEY_REFRESH, '');
+                        })
+                    }
+                },
                 {text: '取消', onPress: () => {console.log("cancel");}}
             ]
         )
@@ -74,7 +78,7 @@ export default class MyPage extends Component{
 
 class PreferenceCompontent extends Component{
     static defaultProps={
-        onPress:null,
+        onPress:()=>{},
         title:'default'
     }
     constructor(props){
@@ -83,11 +87,11 @@ class PreferenceCompontent extends Component{
 
     render(){
         return <TouchableOpacity
-            activeOpacity={0.5}
-            style={styles.preferenceSettingStyle}
-            onPress={this.props.onPress}>
-            <Text style={styles.preferenceSettingTextStyle}>{this.props.title}</Text>
-        </TouchableOpacity>
+                activeOpacity={0.5}
+                style={styles.preferenceSettingStyle}
+                onPress={this.props.onPress}>
+                <Text style={styles.preferenceSettingTextStyle}>{this.props.title}</Text>
+            </TouchableOpacity>
     }
 }
 
@@ -105,7 +109,6 @@ const styles = StyleSheet.create({
         marginLeft:10
     },
     preferenceSettingTextStyle:{
-        fontSize:20,
-        marginLeft:10
+        fontSize:20
     },
 });

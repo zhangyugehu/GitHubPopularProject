@@ -17,9 +17,8 @@ import {
 } from 'react-native';
 import NavigationBar from '../components/NavigationBar'
 import ScrollableTabView from 'react-native-scrollable-tab-view'
-import DetailsPage from './popular/DetailsPage'
-import ItemComponent from '../components/ItemComponent'
-import FavoriteModel from '../model/FavoriteModel'
+import PopularTab from '../components/PopularTabComponent'
+
 
 const KEY_STORAGE = 'custom_key';
 const KEY_REFRESH = 'key_refresh';
@@ -110,106 +109,6 @@ export default class PopularPage extends Component{
         this.setState({
             languages:_languages
         })
-    }
-}
-
-
-
-const BASE_URL = 'https://api.github.com/search/';
-
-class PopularTab extends Component{
-
-    constructor(props){
-        super(props);
-        this.state = {
-            dataSource:new ListView.DataSource({rowHasChanged:(r1, r2)=>r1!==r2}),
-            isRefreshing:false
-        }
-    }
-
-    componentDidMount(){
-        this.requireData();
-    }
-
-    render(){
-        return <View style={styles.tabContainer}>
-            <ListView
-                dataSource={this.state.dataSource}
-                renderRow={this.renderRow.bind(this)}
-                refreshControl={this.renderRefreshController()}>
-
-            </ListView>
-        </View>
-    }
-
-    // render
-    renderRow(item, id, position){
-        return <TouchableOpacity activeOpacity={0.5} onPress={()=>{
-            this.onItemClick(item, position);
-        }}>
-            <View style={styles.itemContainer}>
-                <ItemComponent
-                    name={item.name}
-                    author={item.owner.login}
-                    avatar={item.owner.avatar_url}
-                    favoritePress={(item)=>{this._favoritePress(item)}}/>
-            </View>
-        </TouchableOpacity>
-    }
-    renderRefreshController=()=>{
-        return <RefreshControl
-            title="加载中..."
-            onRefresh={this._onRefresh}
-            colors={['blue', 'red', 'green']}
-            refreshing={this.state.isRefreshing}/>
-    }
-
-    // func
-    requireData(){
-        this.setState({
-            isRefreshing:true
-        });
-        let url = `${BASE_URL}repositories?q=${this.props.tabLabel}&sort=stars`;
-        console.log(url);
-        fetch(url)
-            .then((res) => res.json())
-            .then((json)=>{
-                // json.items.forEach((item)=>{
-                //     console.log(item.owner.avatar_url);
-                // })
-                // console.log(json);
-                this.setState({
-                    dataSource:this.state.dataSource.cloneWithRows(json.items),
-                    isRefreshing:false
-                })
-            })
-            .catch((error)=>{
-                console.log(error);
-                // ToastAndroid.show("网络错误！", ToastAndroid.SHORT);
-                this.setState({
-                    isRefreshing:false
-                });
-            })
-            .done();
-    }
-    onItemClick(item, i){
-        this.props.navigator.push({
-            params:{
-                navigator:this.props.navigator,
-                title:item.name,
-                url:item.html_url
-            },
-            component:DetailsPage
-        });
-    }
-    _favoritePress=(item)=>{
-        FavoriteModel.save(this.props.tabLabel, item,
-            ()=>{
-                console.log("saved");
-            },
-            (error)=>{
-                console.log(error);
-            })
     }
 }
 
